@@ -1,16 +1,8 @@
 #include <Arduboy2.h>
 
-const unsigned char PROGMEM player[] =
-{
-// width, height,
-8, 8,
-0x30, 0x48, 0x84, 0x82, 0x82, 0x84, 0x48, 0x30, 
-};
+#include "src/utils.h"
+#include "src/player.h"
 
-struct Vector {
-  int8_t x = 0;
-  int8_t y = 0;
-};
 
 struct Item {
    Vector pos;
@@ -22,8 +14,7 @@ Arduboy2 ab;
 
 int game_state = 0;
 
-int posx = 60;
-int posy = 50;
+Player player = Player({60, 50}, {1, 1});
 
 Item ball;
 Item ball2;
@@ -60,61 +51,38 @@ void loop() {
   ab.display();
 }
 
-void title() {
+void title()
+{
   ab.setCursor(0, 0);
-  ab.print("    micro collect");
+  ab.print("    micro roboto");
   ab.print("\n\n presiona un boton");
 
-  if (ab.pressed(A_BUTTON) || ab.pressed(B_BUTTON)) {
+  if (ab.pressed(A_BUTTON) || ab.pressed(B_BUTTON))
+  {
     game_state = 1;
-    posx = 60;
-    posy = 50;
+    player.setPosition({60, 50});
     ball_init(&ball, 50, 20, 1, 1);
     ball_init(&ball2, 10, 60, 1, -1);
   }
 }
 
-void gameplay() {
-  if (ab.pressed(LEFT_BUTTON)) {
-    posx -= 1;
-  }
-
-  if (ab.pressed(RIGHT_BUTTON)) {
-    posx += 1;
-  }
-
-  if (ab.pressed(UP_BUTTON)) {
-    posy -= 1;
-  }
-
-  if (ab.pressed(DOWN_BUTTON)) {
-    posy += 1;
-  }
-
-  if (posx < 0) {
-    posx = 0;
-  }
-  if (posx > 120) {
-    posx = 120;
-  }
-  if (posy < 0) {
-    posy = 0;
-  }
-  if (posy > 56) {
-    posy = 56;
-  }
-
+void gameplay()
+{
   ball_update(&ball);
   ball_update(&ball2);
 
+  player.update(ab);
+
+  Vector *position = player.getPosition();
   //if (posx < ball_posx + 6 && posx + 8 > ball_posx && posy < ball_posy + 6 && posy + 8 > ball_posy) {
-  if (overlap(posx, posy, 8, 8, ball.pos.x, ball.pos.y, 6, 6) || overlap(posx, posy, 8, 8, ball2.pos.x, ball2.pos.y, 6, 6)) {
+  if (overlap(position->x, position->y, 8, 8, ball.pos.x, ball.pos.y, 6, 6) || overlap(position->x, position->y, 8, 8, ball2.pos.x, ball2.pos.y, 6, 6))
+  {
     game_state = 2;
   }
 
   ab.fillRect(ball.pos.x, ball.pos.y, 6, 6, WHITE);
   ab.fillRect(ball2.pos.x, ball2.pos.y, 6, 6, WHITE);
-  Sprites::drawOverwrite(posx, posy, player, 0);
+  
 }
 
 void gameover() {
@@ -126,11 +94,10 @@ void gameover() {
   }
 }
 
-void ball_init(struct Item *v, int x, int y, int dirx, int diry) {
-    v->pos.x = x;
-    v->pos.y = y;
-    v->dir.x = dirx;
-    v->dir.y = diry;
+void ball_init(struct Item *v, int8_t x, int8_t y, int8_t dirx, int8_t diry)
+{
+  v->pos = {x, y};
+  v->dir = {dirx, diry};
 }
 
 void ball_update(struct Item *v) {
