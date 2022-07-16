@@ -2,13 +2,6 @@
 
 
 
-const unsigned char PROGMEM player[] =
-{
-// width, height,
-8, 8,
-0x30, 0x48, 0x84, 0x82, 0x82, 0x84, 0x48, 0x30, 
-};
-
 void Player::update(Arduboy2 ab)
 {
   if (ab.pressed(LEFT_BUTTON))
@@ -48,7 +41,7 @@ void Player::update(Arduboy2 ab)
     position.y = 56;
   }
 
-  Sprites::drawOverwrite(position.x, position.y, player, 0);
+  Sprites::drawOverwrite(position.x, position.y, PLAYER_SPRITE, 0);
 }
 
 Vector* Player::getPosition()
