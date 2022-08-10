@@ -3,7 +3,7 @@
 
 #include <Arduboy2.h>
 #include "utils.h"
-
+#include "gameobject.h"
 
 const unsigned char PROGMEM PLAYER_SPRITE[] =
 {
@@ -14,22 +14,18 @@ const unsigned char PROGMEM PLAYER_SPRITE[] =
 
 
 
-class Player
+class Player : public GameObject
 {
 private:
-  Vector position;
   Vector direction;
 
 public:
-  Player(Vector _position, Vector _direction)
+  Player(Vector _position, Vector _direction) : GameObject(_position)
   {
-    position = _position;
     direction = _direction;
   }
 
   void update(Arduboy2 ab);
-  void setPosition(Vector _position);
-  Vector *getPosition();
 };
 
 #endif
